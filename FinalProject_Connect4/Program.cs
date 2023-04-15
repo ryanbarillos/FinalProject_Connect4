@@ -12,8 +12,15 @@ namespace FinalProject_Connect4
     {
         public class Player
         {
+            //Each player will have both wins and losses
             public int  PlayerWins = 0,
                         PlayerLosses = 0;
+
+            //Each player will have the check mark that allows him/her to make his/her turn
+            public bool MyTurn = false;
+
+            //Each player will have a unique identifier for his/her Connect coin
+            public char PlayerCoin = ' ';
         }
         static void Main(string[] args)
         {
