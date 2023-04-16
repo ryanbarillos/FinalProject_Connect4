@@ -56,9 +56,7 @@ namespace FinalProject_Connect4
 
 
             //Welcome Statement
-            Console.WriteLine("Welcome to Connect 4!\nBy Ryan Barillos\n\nPress any key to start...");
-            Console.ReadLine();
-
+            Console.WriteLine("Welcome to Connect 4!\nBy Ryan Barillos\n\n");
 
             //Ask how many players will play
             Console.Write("How many players will play (1-2)? ");
