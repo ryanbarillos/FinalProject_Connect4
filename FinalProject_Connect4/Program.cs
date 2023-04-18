@@ -54,9 +54,22 @@ namespace FinalProject_Connect4
             List<Player> PlayerList = new List<Player>();
             int playerCount = 0;
 
+            /*
+             * Connect Four Board
+             * A 7x6 grid
+             */
+            String[,] ConnectFourBoard =    {
+                                            { "*", "*", "*", "*", "*", "*", "*" },
+                                            { "*", "*", "*", "*", "*", "*", "*" },
+                                            { "*", "*", "*", "*", "*", "*", "*" },
+                                            { "*", "*", "*", "*", "*", "*", "*" },
+                                            { "*", "*", "*", "*", "*", "*", "*" },
+                                            { "*", "*", "*", "*", "*", "*", "*" }
+                                            };
+
 
             //Welcome Statement
-            Console.WriteLine("Welcome to Connect 4!\nBy Ryan Barillos\n\n");
+            Console.WriteLine("Welcome to Connect Four!\nBy Ryan Barillos\n\n");
 
             //Ask how many players will play
             Console.Write("How many players will play (1-2)? ");
@@ -74,11 +87,11 @@ namespace FinalProject_Connect4
                     playerCount = Convert.ToInt16(getPlayerCount);
                     break;
                 }
-            } while (!(playerCount >=1 && playerCount <= 2));
+            } while (!(playerCount >= 1 && playerCount <= 2));
 
 
             //Create our players
-            for (int i = 1;  i <= playerCount; i++)
+            for (int i = 1; i <= playerCount; i++)
             {
                 //Assign name to Player
                 string name = "Player 0" + i.ToString();
@@ -98,7 +111,7 @@ namespace FinalProject_Connect4
                         bool notUsed = true;
                         if (PlayerList.Count != 0)
                         {
-                            foreach(var player in PlayerList)
+                            foreach (var player in PlayerList)
                             {
                                 if (player.GetPlayerCoin() == Convert.ToChar(getCoin))
                                 {
@@ -106,7 +119,7 @@ namespace FinalProject_Connect4
                                     notUsed = false;
                                     break;
                                 }
-                            }    
+                            }
                         }
                         if (notUsed)
                         {
@@ -117,16 +130,8 @@ namespace FinalProject_Connect4
                 } while (true);
 
                 //Create Player object
-                PlayerList.Add(new Player(name, coin)); 
+                PlayerList.Add(new Player(name, coin));
             }
-
-            ////For debugging purposes
-            //foreach (Player a in PlayerList)
-            //{
-            //    Console.WriteLine($"{a.PlayerName}, {a.GetPlayerCoin()}");
-            //}
-
-            
         }
     }
 }
