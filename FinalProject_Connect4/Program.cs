@@ -54,17 +54,13 @@ namespace FinalProject_Connect4
 
     internal class Program
     {
-        static void Main(string[] args)
+        static void GameBoard()
         {
-            //Local Variables
-            List<Player> PlayerList = new List<Player>();
-            int playerCount = 0;
-
             /*
              * Connect Four Board
              * A 7x6 grid
              */
-            String[,] ConnectFourBoard =    {
+            string[,] BoardGrid = new string[6,7] {
                                             { "*", "*", "*", "*", "*", "*", "*" },
                                             { "*", "*", "*", "*", "*", "*", "*" },
                                             { "*", "*", "*", "*", "*", "*", "*" },
@@ -72,6 +68,32 @@ namespace FinalProject_Connect4
                                             { "*", "*", "*", "*", "*", "*", "*" },
                                             { "*", "*", "*", "*", "*", "*", "*" }
                                             };
+
+
+            /*
+             * Printing 2D arrays
+             * 
+             * REFERENCES
+             * https://invidious.baczek.me/watch?v=G1kYoPr1Ru8
+             */
+            for (int i = 0; i < BoardGrid.GetLength(0); i++ )
+            {
+                for (int j = 0; j < BoardGrid.GetLength(1); j++)
+                {
+                    Console.Write(BoardGrid[i, j] + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
+
+        static void Main(string[] args)
+        {
+            //Local Variables
+            List<Player> PlayerList = new List<Player>();
+            int playerCount = 0;
+
+
 
 
             //Welcome Statement
@@ -137,6 +159,10 @@ namespace FinalProject_Connect4
 
                 //Create Player object
                 PlayerList.Add(new Player(name, coin));
+
+
+                //Start the game
+                GameBoard();
             }
         }
     }
