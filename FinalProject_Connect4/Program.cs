@@ -44,6 +44,12 @@ namespace FinalProject_Connect4
     }
 
 
+    //public class CPU:Player
+    //{
+
+    //}
+
+
 
 
     internal class Program
