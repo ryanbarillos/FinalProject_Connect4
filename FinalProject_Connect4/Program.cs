@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 /* 
 * Final Project, Connect 4
@@ -10,6 +12,84 @@ using System.Text.RegularExpressions;
 */
 namespace FinalProject_Connect4
 {
+    public static class ConnectFour
+    {
+        //Local Variables
+        private static string[,] _GameBoard = new string[6, 7];
+
+
+
+        //The board will have any players' coin set
+        public static void SetGameBoard()
+        {
+            //Row of GameBoard
+            for (int a = 0; a < _GameBoard.GetLength(0); a++)
+            {
+                //Column of GameBoard
+                for (int b = 0; b < _GameBoard.GetLength(1); b++)
+                {
+                    _GameBoard[a, b] = "*";
+                }
+            }
+        }
+
+
+
+        //Display the board in all its glory
+        public static void PrintGameBoard()
+        {
+            /*
+             * REFERENCES for the FUTURE
+             * 
+             * Printing 2D arrays
+             * https://invidious.baczek.me/watch?v=G1kYoPr1Ru8
+             * 
+             * Clear Console
+             * https://www.geeksforgeeks.org/console-clear-method-in-c-sharp/
+             */
+
+
+            //Clear the console
+            Console.Clear();
+            
+            //Header
+            Console.WriteLine("Connect Four Board");
+            Console.WriteLine("--------------------------------------------");
+
+            //Row of GameBoard
+            for (int a = 0; a < _GameBoard.GetLength(0); a++)
+            {
+                //Enter new line
+                Console.WriteLine();
+
+                //Column of GameBoard
+                for (int b = 0; b < _GameBoard.GetLength(1); b++)
+                {
+                    Console.Write(_GameBoard[a, b] + "\t");
+                }
+            }
+
+            //Print out the column numbers of the board
+            Console.WriteLine();
+            for (int i = 0; i <= _GameBoard.GetLength(0); i++)
+            {
+                Console.Write((i + 1).ToString() + "\t");
+            }
+            Console.WriteLine();
+            Console.WriteLine("--------------------------------------------");
+            Console.WriteLine("NOTE: These numbers represent the COLUMN NO.");
+            Console.WriteLine("--------------------------------------------");
+
+
+            //Enter new lines
+            Console.WriteLine();
+        }
+    }
+
+
+
+
+
     public class Player
     {
         //Each player will have both wins and losses
@@ -44,6 +124,9 @@ namespace FinalProject_Connect4
     }
 
 
+
+
+
     //public class CPU:Player
     //{
 
@@ -52,38 +135,18 @@ namespace FinalProject_Connect4
 
 
 
+
     internal class Program
     {
-        static void GameBoard()
+        static void PlayGame(List<Player> PlayerList, int playerCount)
         {
             /*
              * Connect Four Board
              * A 7x6 grid
              */
-            string[,] BoardGrid = new string[6,7] {
-                                            { "*", "*", "*", "*", "*", "*", "*" },
-                                            { "*", "*", "*", "*", "*", "*", "*" },
-                                            { "*", "*", "*", "*", "*", "*", "*" },
-                                            { "*", "*", "*", "*", "*", "*", "*" },
-                                            { "*", "*", "*", "*", "*", "*", "*" },
-                                            { "*", "*", "*", "*", "*", "*", "*" }
-                                            };
-
-
-            /*
-             * Printing 2D arrays
-             * 
-             * REFERENCES
-             * https://invidious.baczek.me/watch?v=G1kYoPr1Ru8
-             */
-            for (int i = 0; i < BoardGrid.GetLength(0); i++ )
-            {
-                for (int j = 0; j < BoardGrid.GetLength(1); j++)
-                {
-                    Console.Write(BoardGrid[i, j] + " ");
-                }
-                Console.WriteLine();
-            }
+            ConnectFour.SetGameBoard();
+            ConnectFour.PrintGameBoard();
+            Console.Write(PlayerList[0].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
         }
 
 
@@ -95,9 +158,10 @@ namespace FinalProject_Connect4
 
 
 
-
             //Welcome Statement
             Console.WriteLine("Welcome to Connect Four!\nBy Ryan Barillos\n\n");
+
+
 
             //Ask how many players will play
             Console.Write("How many players will play (1-2)? ");
@@ -116,6 +180,7 @@ namespace FinalProject_Connect4
                     break;
                 }
             } while (!(playerCount >= 1 && playerCount <= 2));
+
 
 
             //Create our players
@@ -157,13 +222,12 @@ namespace FinalProject_Connect4
                     }
                 } while (true);
 
+
                 //Create Player object
                 PlayerList.Add(new Player(name, coin));
-
-
-                //Start the game
-                GameBoard();
             }
+            //Start the game
+            PlayGame(PlayerList, playerCount);
         }
     }
 }
