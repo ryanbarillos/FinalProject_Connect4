@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 /* 
 * Final Project, Connect 4
 * by Ryan Barillos, 439090
@@ -28,7 +29,7 @@ namespace FinalProject_Connect4
                 //Column of GameBoard
                 for (int b = 0; b < _GameBoard.GetLength(1); b++)
                 {
-                    _GameBoard[a, b] = "*";
+                    _GameBoard[a, b] = " ";
                 }
             }
         }
@@ -89,6 +90,16 @@ namespace FinalProject_Connect4
             //Enter new lines
             Console.WriteLine();
         }
+
+
+
+        //public static void InsertCoinInGameBoard(int columnNo)
+        //{
+        //    for (int i = _GameBoard.GetLength(0);  --i >= 0;)
+        //    {
+        //        if (_GameBoard[i, columnNo] == )
+        //    }
+        //}
     }
 
 
@@ -143,18 +154,6 @@ namespace FinalProject_Connect4
 
     internal class Program
     {
-        static void PlayGame(List<Player> PlayerList, int playerCount)
-        {
-            /*
-             * Connect Four Board
-             * A 7x6 grid
-             */
-            ConnectFour.SetGameBoard();
-            ConnectFour.PrintGameBoard();
-            Console.Write(PlayerList[0].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
-        }
-
-
         static void Main(string[] args)
         {
             //Local Variables
@@ -196,13 +195,15 @@ namespace FinalProject_Connect4
 
                 //Assign coin symbol to Player
                 char coin;
+
+                Console.Write($"\n{name}, set your coin symbol (only ONE CHARACTER): ");
                 do
                 {
-                    Console.Write($"\n{name}, set your coin symbol (only ONE CHARACTER): ");
                     string getCoin = Console.ReadLine();
 
                     //Make sure only one char is entered
-                    if (getCoin.Length > 1) Console.WriteLine("Please enter ONLY ONE character");
+                    if (getCoin.Length > 1) Console.Write("Please enter ONLY ONE character: ");
+                    else if (getCoin == " ") Console.Write("Whitespace is a RESERVED char. Choose something else: ");
                     else
                     {
                         //Check if entered symbol hasn't been used by another Player
@@ -233,6 +234,51 @@ namespace FinalProject_Connect4
             }
             //Start the game
             PlayGame(PlayerList, playerCount);
+        }
+
+
+
+
+
+        static void PlayGame(List<Player> PlayerList, int playerCount)
+        {
+            //List down ALL Players' coin symbols
+            List<string> PlayerCoinsAll = new List<string>();
+            for (int a = 0; a < playerCount; a++)
+            {
+                PlayerCoinsAll.Add((PlayerList[a].GetPlayerCoin()).ToString());
+            }
+
+            //Some local variables
+            int columnNo = -1;
+
+
+            //Prepare Game Board
+            ConnectFour.SetGameBoard();
+            ConnectFour.PrintGameBoard();
+
+
+            //Ask player where to place his/her coin
+            Console.Write(PlayerList[0].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
+        //    do
+        //    {
+        //        Regex matchPlayerCount = new Regex(@"^[1-7]$");
+        //        string getColumnNo = Console.ReadLine();
+
+        //        if (!matchPlayerCount.IsMatch(getColumnNo))
+        //        {
+        //            Console.Write("ERROR! Enter from 1 to 7: ");
+        //        }
+        //        else
+        //        {
+        //            playerCount = Convert.ToInt16(getColumnNo);
+        //            break;
+        //        }
+        //    } while (!(playerCount >= 1 && playerCount <= 2));
+        //} while (true);
+
+
+
         }
     }
 }
