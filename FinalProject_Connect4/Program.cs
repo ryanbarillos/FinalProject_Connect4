@@ -52,7 +52,7 @@ namespace FinalProject_Connect4
 
             //Clear the console
             Console.Clear();
-            
+
             //Header
             Console.WriteLine("Connect Four Board");
             Console.WriteLine("--------------------------------------------");
@@ -111,6 +111,50 @@ namespace FinalProject_Connect4
             }
             return coinPlaced;
         }
+
+
+
+        /*
+         * Return more than one value in this function, like one can do in Python
+         * 
+         * https://devblogs.microsoft.com/dotnet/whats-new-in-csharp-7-0/
+         * https://stackoverflow.com/a/42926327
+         */
+        public static (bool patternFound, string patternMessage) FindWinner(char coin)
+        {
+            //Local Variables
+            bool patternFound = false;
+            string theCoin = coin.ToString(), patternMessage = "";
+
+
+            //Iterate each column from the bottom-up
+            for (int a = _GameBoard.GetLength(0) - 1; a > 0; a--)
+            {
+                int rowNo = 3;
+
+                //Scan each row for winning patterns, from left to right
+                for (int b = rowNo; b < _GameBoard.GetLength(1) - 1; ++b)
+                {
+                    if (_GameBoard[a, b] == theCoin)
+                    {
+                        if (_GameBoard[a, b - 1] == theCoin)
+                        {
+                            if (_GameBoard[a, b - 2] == theCoin)
+                            {
+                                if (_GameBoard[a, b - 3] == theCoin)
+                                {
+                                    //Bring the news out---a winner is found!
+                                    patternFound = true;
+                                    patternMessage = "Horizontal Line DETECTED!";
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return (patternFound, patternMessage);
+        }
     }
 
 
@@ -125,12 +169,22 @@ namespace FinalProject_Connect4
         //Each player will have the check mark that allows him/her to make his/her turn
         public bool MyTurn = false;
 
+
+        //Each player will have an indicator on if he/she wins or not
+        private bool _HasWon = false;
+        public bool VictoryStatus()
+        {
+            return _HasWon;
+        }
+
+
         //Each player will have a unique symbol for his/her Connect coin
         private char _PlayerCoin;
         public void SetPlayerCoin(char symbol)
         {
             _PlayerCoin = symbol;
         }
+
 
         //Each player will be able to retreive his/her coin's symbol
         public char GetPlayerCoin()
@@ -179,6 +233,15 @@ namespace FinalProject_Connect4
             return 1;
         }
 
+        //Identify who won the game
+        public static void PlayerHasWon(Player Player)
+        {
+            if (!Player.VictoryStatus())
+            {
+                Player._HasWon = true;
+            }
+        }
+
         //Each Player will be able to set a name
         public string PlayerName { get; set; }
 
@@ -212,12 +275,8 @@ namespace FinalProject_Connect4
             List<Player> PlayerList = new List<Player>();
             int playerCount = 0;
 
-
-
             //Welcome Statement
             Console.WriteLine("Welcome to Connect Four!\nBy Ryan Barillos\n\n");
-
-
 
             //Ask how many players will play
             Console.Write("How many players will play (1-2)? ");
@@ -296,16 +355,16 @@ namespace FinalProject_Connect4
             //Prepare Game Board
             ConnectFour.SetGameBoard();
 
-
-
-            while (true)
+            //Start the game
+            bool someoneWon = false;
+            while (!someoneWon)
             {
                 //Prepare the players
                 Player.WhoseTurnDecide(PlayerList);
                 int playingNow = Player.WhoseTurnIsIt(PlayerList);
 
                 //Some local variables
-                int columnNo = -1;                    
+                int columnNo = -1;
                 bool isPlayerDone = false;
 
                 //Show the board
@@ -332,11 +391,20 @@ namespace FinalProject_Connect4
                     //Place coin in board, when possible
                     isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
 
-                    //Otherwise, force player to pick anotehr column
-                    Console.Clear();
-                    ConnectFour.PrintGameBoard();
+                    //When FULL, force player to pick another column
                     if (!isPlayerDone) Console.Write("Column is FULL. Pick another column: ");
+                    else
+                    {
+                        var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
+                        bool hasSomeoneWon = pieces.Item1;
+                        string message= pieces.Item2;
 
+                        if (hasSomeoneWon)
+                        {
+                            someoneWon = hasSomeoneWon;
+                            Console.WriteLine(message);
+                        }
+                    }
                 } while (!isPlayerDone);
             }
         }
