@@ -73,6 +73,11 @@ namespace FinalProject_Connect4
             Console.WriteLine();
             for (int i = 0; i <= _GameBoard.GetLength(0); i++)
             {
+                Console.Write("-" + "\t");
+            }
+            Console.WriteLine();
+            for (int i = 0; i <= _GameBoard.GetLength(0); i++)
+            {
                 Console.Write((i + 1).ToString() + "\t");
             }
             Console.WriteLine();
