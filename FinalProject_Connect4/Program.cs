@@ -142,16 +142,16 @@ namespace FinalProject_Connect4
                 else
                 {
                     //Player 01's Turn
-                    if (PlayerList[0].MyTurn)
-                    {
-                        PlayerList[0].MyTurn = false;
-                        PlayerList[1].MyTurn = true;
-                    }
-                    //Player 02's Turn
-                    else if (PlayerList[1].MyTurn)
+                    if (!PlayerList[0].MyTurn)
                     {
                         PlayerList[0].MyTurn = true;
                         PlayerList[1].MyTurn = false;
+                    }
+                    //Player 02's Turn
+                    else if (!PlayerList[1].MyTurn)
+                    {
+                        PlayerList[0].MyTurn = false;
+                        PlayerList[1].MyTurn = true;
                     }
                 }
             }
