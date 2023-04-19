@@ -127,6 +127,36 @@ namespace FinalProject_Connect4
             return _PlayerCoin;
         }
 
+        //Each player will take their turns
+        public static void WhoseTurn(List<Player> PlayerList)
+        {
+            if (PlayerList.Count == 2)
+            {
+                //At the start of the game, make 1st player be the first to play
+                if (PlayerList[0].MyTurn && PlayerList[1].MyTurn)
+                {
+                    PlayerList[0].MyTurn = true;
+                    PlayerList[1].MyTurn = false;
+                }
+                //During gameplay, alternate turns
+                else
+                {
+                    //Player 01's Turn
+                    if (PlayerList[0].MyTurn)
+                    {
+                        PlayerList[0].MyTurn = false;
+                        PlayerList[1].MyTurn = true;
+                    }
+                    //Player 02's Turn
+                    else if (PlayerList[1].MyTurn)
+                    {
+                        PlayerList[0].MyTurn = true;
+                        PlayerList[1].MyTurn = false;
+                    }
+                }
+            }
+        }
+
         //Each Player will be able to set a name
         public string PlayerName { get; set; }
 
@@ -250,35 +280,37 @@ namespace FinalProject_Connect4
             }
 
             //Some local variables
-            int columnNo = -1;
-
+            int columnNo;
 
             //Prepare Game Board
             ConnectFour.SetGameBoard();
-            ConnectFour.PrintGameBoard();
 
+            //Make Player 01 go first
+
+
+
+
+
+            ConnectFour.PrintGameBoard();
 
             //Ask player where to place his/her coin
             Console.Write(PlayerList[0].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
-        //    do
-        //    {
-        //        Regex matchPlayerCount = new Regex(@"^[1-7]$");
-        //        string getColumnNo = Console.ReadLine();
+            do
+            {
+                Regex matchColumnNo = new Regex(@"^[1-7]$");
+                string getColumnNo = Console.ReadLine();
 
-        //        if (!matchPlayerCount.IsMatch(getColumnNo))
-        //        {
-        //            Console.Write("ERROR! Enter from 1 to 7: ");
-        //        }
-        //        else
-        //        {
-        //            playerCount = Convert.ToInt16(getColumnNo);
-        //            break;
-        //        }
-        //    } while (!(playerCount >= 1 && playerCount <= 2));
-        //} while (true);
-
-
-
+                if (!(matchColumnNo.IsMatch(getColumnNo)))
+                {
+                    Console.Write("ERROR! Enter from 1 to 7: ");
+                }
+                else
+                {
+                    //Get proper index, from 0 to 6
+                    columnNo = Convert.ToInt16(getColumnNo) - 1;
+                    break;
+                }
+            } while (!(playerCount >= 1 && playerCount <= 2));
         }
     }
 }
