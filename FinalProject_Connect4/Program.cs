@@ -93,13 +93,24 @@ namespace FinalProject_Connect4
 
 
 
-        //public static void InsertCoinInGameBoard(int columnNo)
-        //{
-        //    for (int i = _GameBoard.GetLength(0);  --i >= 0;)
-        //    {
-        //        if (_GameBoard[i, columnNo] == )
-        //    }
-        //}
+        public static bool InsertCoinInGameBoard(int row, char coin)
+        {
+            //Check if coin is placed
+            bool coinPlaced = false;
+
+            //Scan from the bottom-up for a free row
+            for (int i = _GameBoard.GetLength(0); --i >= 0;)
+            {
+                //Place coin
+                if (_GameBoard[i, row] == " ")
+                {
+                    _GameBoard[i, row] = coin.ToString();
+                    coinPlaced = true;
+                    break;
+                }
+            }
+            return coinPlaced;
+        }
     }
 
 
@@ -130,7 +141,11 @@ namespace FinalProject_Connect4
         //Each player will take their turns
         public static void WhoseTurnDecide(List<Player> PlayerList)
         {
-            //At the VERY START of the game, make 1st player be the first to play
+            /*
+             * At the VERY START of the game, make 1st player be the first to play
+             * Since, at initilaization of Player object, its "bool MyTurn" = false
+             * Thus, both players will have same values
+             */
             if (PlayerList[0].MyTurn == PlayerList[1].MyTurn)
             {
                 PlayerList[0].MyTurn = true;
@@ -265,7 +280,6 @@ namespace FinalProject_Connect4
                     }
                 } while (true);
 
-
                 //Create Player object
                 PlayerList.Add(new Player(name, coin));
             }
@@ -279,40 +293,52 @@ namespace FinalProject_Connect4
 
         static void PlayGame(List<Player> PlayerList, int playerCount)
         {
-            //List down ALL Players' coin symbols
-            List<string> PlayerCoinsAll = new List<string>();
-            for (int a = 0; a < playerCount; a++)
-            {
-                PlayerCoinsAll.Add((PlayerList[a].GetPlayerCoin()).ToString());
-            }
-
-            //Some local variables
-            int columnNo;
-
             //Prepare Game Board
             ConnectFour.SetGameBoard();
 
 
-            ConnectFour.PrintGameBoard();
 
-            //Ask player where to place his/her coin
-            Console.Write(PlayerList[0].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
-            do
+            while (true)
             {
-                Regex matchColumnNo = new Regex(@"^[1-7]$");
-                string getColumnNo = Console.ReadLine();
+                //Prepare the players
+                Player.WhoseTurnDecide(PlayerList);
+                int playingNow = Player.WhoseTurnIsIt(PlayerList);
 
-                if (!(matchColumnNo.IsMatch(getColumnNo)))
+                //Some local variables
+                int columnNo = -1;                    
+                bool isPlayerDone = false;
+
+                //Show the board
+                ConnectFour.PrintGameBoard();
+
+                //Ask player where to place his/her coin
+                Console.Write(PlayerList[playingNow].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
+
+                do
                 {
-                    Console.Write("ERROR! Enter from 1 to 7: ");
-                }
-                else
-                {
-                    //Get proper index, from 0 to 6
-                    columnNo = Convert.ToInt16(getColumnNo) - 1;
-                    break;
-                }
-            } while (!(playerCount >= 1 && playerCount <= 2));
+                    //Ensure that columnNo is 1-7
+                    Regex matchColumnNo = new Regex(@"^[1-7]$");
+                    string getColumnNo = Console.ReadLine();
+
+                    if (!(matchColumnNo.IsMatch(getColumnNo)))
+                    {
+                        Console.Write("ERROR! Enter from 1 to 7: ");
+                    }
+                    else
+                    {
+                        //Get proper index, from 0 to 6
+                        columnNo = Convert.ToInt16(getColumnNo) - 1;
+                    }
+                    //Place coin in board, when possible
+                    isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
+
+                    //Otherwise, force player to pick anotehr column
+                    Console.Clear();
+                    ConnectFour.PrintGameBoard();
+                    if (!isPlayerDone) Console.Write("Column is FULL. Pick another column: ");
+
+                } while (!isPlayerDone);
+            }
         }
     }
 }
