@@ -128,33 +128,40 @@ namespace FinalProject_Connect4
         }
 
         //Each player will take their turns
-        public static void WhoseTurn(List<Player> PlayerList)
+        public static void WhoseTurnDecide(List<Player> PlayerList)
         {
-            if (PlayerList.Count == 2)
+            //At the VERY START of the game, make 1st player be the first to play
+            if (PlayerList[0].MyTurn == PlayerList[1].MyTurn)
             {
-                //At the start of the game, make 1st player be the first to play
-                if (PlayerList[0].MyTurn && PlayerList[1].MyTurn)
+                PlayerList[0].MyTurn = true;
+                PlayerList[1].MyTurn = false;
+            }
+            //During gameplay, alternate turns
+            else
+            {
+                //Player 01's Turn
+                if (!PlayerList[0].MyTurn)
                 {
                     PlayerList[0].MyTurn = true;
                     PlayerList[1].MyTurn = false;
                 }
-                //During gameplay, alternate turns
-                else
+                //Player 02's Turn
+                else if (!PlayerList[1].MyTurn)
                 {
-                    //Player 01's Turn
-                    if (!PlayerList[0].MyTurn)
-                    {
-                        PlayerList[0].MyTurn = true;
-                        PlayerList[1].MyTurn = false;
-                    }
-                    //Player 02's Turn
-                    else if (!PlayerList[1].MyTurn)
-                    {
-                        PlayerList[0].MyTurn = false;
-                        PlayerList[1].MyTurn = true;
-                    }
+                    PlayerList[0].MyTurn = false;
+                    PlayerList[1].MyTurn = true;
                 }
             }
+        }
+
+        //Identify whose turn is it
+        public static int WhoseTurnIsIt(List<Player> PlayerList)
+        {
+            //Player 01's Turn
+            if (PlayerList[0].MyTurn) return 0;
+
+            //Player 02's Turn
+            return 1;
         }
 
         //Each Player will be able to set a name
@@ -284,11 +291,6 @@ namespace FinalProject_Connect4
 
             //Prepare Game Board
             ConnectFour.SetGameBoard();
-
-            //Make Player 01 go first
-
-
-
 
 
             ConnectFour.PrintGameBoard();
