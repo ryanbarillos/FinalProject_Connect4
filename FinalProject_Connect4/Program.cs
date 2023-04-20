@@ -127,12 +127,12 @@ namespace FinalProject_Connect4
             string theCoin = coin.ToString(), patternMessage = "";
 
 
+            /*
+             * CHECK #1
+             * Search for a Horizontal Line "---"
+             */
             if (!patternFound)
             {
-                /*
-                 * CHECK #1
-                 * Search for a Horizontal Line "---"
-                 */
                 for (int a = _GameBoard.GetLength(0) - 1; a > 0; a--)
                 {
                     int rowNo = 3;
@@ -213,8 +213,44 @@ namespace FinalProject_Connect4
                                             {
                                                 //Bring the news out---a winner is found!
                                                 patternFound = true;
-                                                patternMessage = "Diagonal Line (Forward Slash) DETECTED!";
+                                                patternMessage = "Diagonal Line '/' DETECTED!";
                                                 break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        /*
+                         * CHECK #4
+                         * Search for a Forward Back Slash "\\\"
+                         * 
+                         * NOTE:
+                         * a) Reverse "CHECK #4" to get this to work
+                         */
+                        if (!patternFound)
+                        {
+                            for (int a = _GameBoard.GetLength(0) - 4; a > 0; a--)
+                            {
+                                int rowNo = 3;
+
+                                //Scan each row for winning patterns, from left to right
+                                for (int b = rowNo; b < _GameBoard.GetLength(1); ++b)
+                                {
+                                    if (_GameBoard[a, b - 3] == theCoin)
+                                    {
+                                        if (_GameBoard[a + 1, b - 2] == theCoin)
+                                        {
+                                            if (_GameBoard[a + 2, b - 1] == theCoin)
+                                            {
+                                                if (_GameBoard[a + 3, b] == theCoin)
+                                                {
+                                                    //Bring the news out---a winner is found!
+                                                    patternFound = true;
+                                                    //Use string literation to print out the back slash
+                                                    patternMessage = @"Diagonal Line '\' DETECTED!";
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
@@ -233,9 +269,6 @@ namespace FinalProject_Connect4
 
         public class Player
         {
-            //Each player will have both wins and losses
-            public int PlayerWins = 0, PlayerLosses = 0;
-
             //Each player will have the check mark that allows him/her to make his/her turn
             public bool MyTurn = false;
 
