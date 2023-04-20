@@ -127,13 +127,16 @@ namespace FinalProject_Connect4
             string theCoin = coin.ToString(), patternMessage = "";
 
 
-            //Iterate each column from the bottom-up
+            /*
+             * CHECK #1
+             * Search for a horizontal line
+             */
             for (int a = _GameBoard.GetLength(0) - 1; a > 0; a--)
             {
                 int rowNo = 3;
 
                 //Scan each row for winning patterns, from left to right
-                for (int b = rowNo; b < _GameBoard.GetLength(1) - 1; ++b)
+                for (int b = rowNo; b < _GameBoard.GetLength(1); ++b)
                 {
                     if (_GameBoard[a, b] == theCoin)
                     {
@@ -376,28 +379,38 @@ namespace FinalProject_Connect4
                 do
                 {
                     //Ensure that columnNo is 1-7
-                    Regex matchColumnNo = new Regex(@"^[1-7]$");
-                    string getColumnNo = Console.ReadLine();
+                    do {
+                        Regex matchColumnNo = new Regex(@"^[1-7]$");
+                        string getColumnNo = Console.ReadLine();
 
-                    if (!(matchColumnNo.IsMatch(getColumnNo)))
-                    {
-                        Console.Write("ERROR! Enter from 1 to 7: ");
-                    }
-                    else
-                    {
-                        //Get proper index, from 0 to 6
-                        columnNo = Convert.ToInt16(getColumnNo) - 1;
-                    }
+                        if (!(matchColumnNo.IsMatch(getColumnNo)))
+                        {
+                            ConnectFour.PrintGameBoard();
+                            Console.Write("ERROR! Enter from 1 to 7: ");
+                        }
+                        else
+                        {
+                            //Get proper index, from 0 to 6
+                            columnNo = Convert.ToInt16(getColumnNo) - 1;
+                        }
+                    } while (!(columnNo >=0 && columnNo <= 6));
+
+
                     //Place coin in board, when possible
                     isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
 
+
                     //When FULL, force player to pick another column
-                    if (!isPlayerDone) Console.Write("Column is FULL. Pick another column: ");
+                    if (!isPlayerDone)
+                    {
+                        ConnectFour.PrintGameBoard();
+                        Console.Write("Column is FULL. Pick another column: ");
+                    }
                     else
                     {
                         var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
                         bool hasSomeoneWon = pieces.Item1;
-                        string message= pieces.Item2;
+                        string message = pieces.Item2;
 
                         if (hasSomeoneWon)
                         {
