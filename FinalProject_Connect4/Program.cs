@@ -9,7 +9,7 @@ using System.Xml.Linq;
 * by Ryan Barillos, 439090
 * 
 * Date Started: 15 Apr 2023
-* Day Finished: 21 Apr 2023 (hopefully)
+* Day Finished: 20 Apr 2023
 */
 namespace FinalProject_Connect4
 {
@@ -114,8 +114,36 @@ namespace FinalProject_Connect4
 
 
 
+        public static bool IsGameBoardFull()
+        {
+            int emptyTilesLeft = 0;
+
+            //Row of GameBoard
+            for (int a = 0; a < _GameBoard.GetLength(0); a++)
+            {
+                //Column of GameBoard
+                for (int b = 0; b < _GameBoard.GetLength(1); b++)
+                {
+                    /*
+                     * Scan for any more empty spaces
+                     * Otherwise, game over---it's a draw!
+                     * 
+                     * All tiles have been occupied
+                     */
+                    if (_GameBoard[a, b] == " ")
+                    {
+                        emptyTilesLeft++;
+                    }
+                }
+            }
+            if (emptyTilesLeft > 0) return false;
+            return true;
+        }
+
+
+
         /*
-         * Return more than one value in this function, like one can do in Python
+         * Return more than one value in this function, like in Python
          * 
          * https://devblogs.microsoft.com/dotnet/whats-new-in-csharp-7-0/
          * https://stackoverflow.com/a/42926327
@@ -125,6 +153,7 @@ namespace FinalProject_Connect4
             //Local Variables
             bool patternFound = false;
             string theCoin = coin.ToString(), patternMessage = "";
+            int limitColumn = -1, limitRow = _GameBoard.GetLength(1);
 
 
             /*
@@ -133,12 +162,10 @@ namespace FinalProject_Connect4
              */
             if (!patternFound)
             {
-                for (int a = _GameBoard.GetLength(0) - 1; a > 0; a--)
+                for (int a = _GameBoard.GetLength(0) - 1; a > limitColumn; a--)
                 {
-                    int rowNo = 3;
-
                     //Scan each row for winning patterns, from left to right
-                    for (int b = rowNo; b < _GameBoard.GetLength(1); ++b)
+                    for (int b = 3; b < limitRow; ++b)
                     {
                         if (_GameBoard[a, b] == theCoin)
                         {
@@ -150,7 +177,7 @@ namespace FinalProject_Connect4
                                     {
                                         //Bring the news out---a winner is found!
                                         patternFound = true;
-                                        patternMessage = "Horizontal Line DETECTED!";
+                                        patternMessage = "Horizontal Line '--' DETECTED!";
                                         break;
                                     }
                                 }
@@ -164,10 +191,10 @@ namespace FinalProject_Connect4
                  */
                 if (!patternFound)
                 {
-                    for (int a = _GameBoard.GetLength(0) - 4; a > 0; a--)
+                    for (int a = _GameBoard.GetLength(0) - 4; a > limitColumn; a--)
                     {
                         //Scan each row for winning patterns, from left to right
-                        for (int b = 0; b < _GameBoard.GetLength(1); ++b)
+                        for (int b = 0; b < limitRow; ++b)
                         {
                             if (_GameBoard[a, b] == theCoin)
                             {
@@ -179,7 +206,7 @@ namespace FinalProject_Connect4
                                         {
                                             //Bring the news out---a winner is found!
                                             patternFound = true;
-                                            patternMessage = "Vertical Line DETECTED!";
+                                            patternMessage = "Vertical Line '|' DETECTED!";
                                             break;
                                         }
                                     }
@@ -196,12 +223,12 @@ namespace FinalProject_Connect4
                      */
                     if (!patternFound)
                     {
-                        for (int a = _GameBoard.GetLength(0) - 4; a > 0; a--)
+                        for (int a = _GameBoard.GetLength(0) - 4; a > limitColumn; a--)
                         {
                             int rowNo = 3;
 
                             //Scan each row for winning patterns, from left to right
-                            for (int b = rowNo; b < _GameBoard.GetLength(1); ++b)
+                            for (int b = rowNo; b < limitRow; ++b)
                             {
                                 if (_GameBoard[a, b] == theCoin)
                                 {
@@ -230,12 +257,12 @@ namespace FinalProject_Connect4
                          */
                         if (!patternFound)
                         {
-                            for (int a = _GameBoard.GetLength(0) - 4; a > 0; a--)
+                            for (int a = _GameBoard.GetLength(0) - 4; a > limitColumn; a--)
                             {
                                 int rowNo = 3;
 
                                 //Scan each row for winning patterns, from left to right
-                                for (int b = rowNo; b < _GameBoard.GetLength(1); ++b)
+                                for (int b = rowNo; b < limitRow; ++b)
                                 {
                                     if (_GameBoard[a, b - 3] == theCoin)
                                     {
@@ -428,7 +455,7 @@ namespace FinalProject_Connect4
                                 {
                                     if (player.GetPlayerCoin() == Convert.ToChar(getCoin))
                                     {
-                                        Console.WriteLine("SYMBOL ALREADY TAKEN! Please try again.");
+                                        Console.Write("SYMBOL ALREADY TAKEN! Choose something else: ");
                                         notUsed = false;
                                         break;
                                     }
@@ -459,8 +486,11 @@ namespace FinalProject_Connect4
                 ConnectFour.SetGameBoard();
 
                 //Start the game
-                bool someoneWon = false;
-                while (!someoneWon)
+                bool someoneWon = false,
+                    endInDraw = ConnectFour.IsGameBoardFull();
+                int winner = 0;
+
+                while (!(someoneWon || endInDraw))
                 {
                     //Prepare the players
                     Player.WhoseTurnDecide(PlayerList);
@@ -473,9 +503,9 @@ namespace FinalProject_Connect4
                     //Show the board
                     ConnectFour.PrintGameBoard();
 
-                    //Ask player where to place his/her coin
-                    Console.Write(PlayerList[playingNow].PlayerName + ", pick a COLUMN NUMBER to place your coin: ");
 
+                    //Ask player where to place his/her coin
+                    Console.Write(PlayerList[playingNow].PlayerName + ", pick a COLUMN NUMBER to place your coin '" + PlayerList[playingNow].GetPlayerCoin() + "': ");
                     do
                     {
                         //Ensure that columnNo is 1-7
@@ -510,16 +540,35 @@ namespace FinalProject_Connect4
                         else
                         {
                             var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
-                            bool hasSomeoneWon = pieces.Item1;
+                            bool hasSomeoneWon = pieces.Item1,
+                                hasNobodyWon = ConnectFour.IsGameBoardFull();
                             string message = pieces.Item2;
 
                             if (hasSomeoneWon)
                             {
                                 someoneWon = hasSomeoneWon;
+                                ConnectFour.PrintGameBoard();
                                 Console.WriteLine(message);
+                                winner = playingNow;
+                            }
+                            else if (hasNobodyWon)
+                            {
+                                ConnectFour.PrintGameBoard();
+                                endInDraw = hasNobodyWon;
                             }
                         }
                     } while (!isPlayerDone);
+
+
+                    if (someoneWon)
+                    {
+                        Console.WriteLine($"{PlayerList[winner].PlayerName} WINS!");
+                    }
+                    else if (endInDraw)
+                    {
+                        Console.WriteLine("No more EMPTY tiles left!");
+                        Console.WriteLine("Game ends in DRAW.");
+                    }
                 }
             }
         }
