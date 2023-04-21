@@ -9,7 +9,7 @@ using System.Xml.Linq;
 * by Ryan Barillos, 439090
 * 
 * Date Started: 15 Apr 2023
-* Day Finished: 21 Apr 2023
+* Day Finished: 20 Apr 2023
 */
 namespace FinalProject_Connect4
 {
@@ -93,7 +93,7 @@ namespace FinalProject_Connect4
 
 
 
-        public static bool InsertCoinInGameBoard(int column, char coin)
+        public static bool InsertCoinInGameBoard(int row, char coin)
         {
             //Check if coin is placed
             bool coinPlaced = false;
@@ -102,9 +102,9 @@ namespace FinalProject_Connect4
             for (int i = _GameBoard.GetLength(0); --i >= 0;)
             {
                 //Place coin
-                if (_GameBoard[i, column] == " ")
+                if (_GameBoard[i, row] == " ")
                 {
-                    _GameBoard[i, column] = coin.ToString();
+                    _GameBoard[i, row] = coin.ToString();
                     coinPlaced = true;
                     break;
                 }
@@ -293,26 +293,36 @@ namespace FinalProject_Connect4
 
 
 
+
         public class Player
         {
             //Each player will have the check mark that allows him/her to make his/her turn
             public bool MyTurn = false;
 
-            /*
-             * Each player will have a unique symbol for his/her Connect coin
-             * and be able to retreive his/her coin's symbol
-             */
+
+            //Each player will have an indicator on if he/she wins or not
+            private bool _HasWon = false;
+            public bool VictoryStatus()
+            {
+                return _HasWon;
+            }
+
+
+            //Each player will have a unique symbol for his/her Connect coin
             private char _PlayerCoin;
             public void SetPlayerCoin(char symbol)
             {
                 _PlayerCoin = symbol;
             }
+
+
+            //Each player will be able to retreive his/her coin's symbol
             public char GetPlayerCoin()
             {
                 return _PlayerCoin;
             }
 
-            //Each player will take his/her turn
+            //Each player will take their turns
             public static void WhoseTurnDecide(List<Player> PlayerList)
             {
                 /*
@@ -353,56 +363,35 @@ namespace FinalProject_Connect4
                 return 1;
             }
 
+            //Identify who won the game
+            public static void PlayerHasWon(Player Player)
+            {
+                if (!Player.VictoryStatus())
+                {
+                    Player._HasWon = true;
+                }
+            }
+
             //Each Player will be able to set a name
             public string PlayerName { get; set; }
 
             //Player Constructor
-            public Player(string pName, char pCoin)
+            public Player(string name, char coin)
             {
-                PlayerName = pName;
-                SetPlayerCoin(pCoin);
+                PlayerName = name;
+                SetPlayerCoin(coin);
 
             }
         }
 
 
 
-        public class PlayerReal : Player
-        {
-            /*
-             * NOTE
-             * 
-             * This refers to an actual human being playing this game
-             */
-            //Player Constructor
-            public PlayerReal(string rpName, char rpCoin) : base(rpName, rpCoin)
-            {
-                PlayerName = rpName;
-                SetPlayerCoin(rpCoin);
-
-            }
-        }
 
 
+        //public class CPU:Player
+        //{
 
-        public class CPU : Player
-        {
-            /*
-             * NOTE
-             * 
-             * CPU refers to "Computer User/Player" AKA Computer-generated Player
-             * This notation was first used in Nintendo's "Super Smash Bros. Brawl" on the Wii console
-             * 
-             * https://www.ssbwiki.com/List_of_abbreviations#General_terms
-             */
-            //CPU Constructor
-            public CPU(string cpuName, char cpuCoin) : base(cpuName, cpuCoin)
-            {
-                PlayerName = "CPU";
-                SetPlayerCoin(cpuCoin);
-
-            }
-        }
+        //}
 
 
 
@@ -438,71 +427,56 @@ namespace FinalProject_Connect4
                 } while (!(playerCount >= 1 && playerCount <= 2));
 
 
-                /*
-                 * Settings for Single Player
-                 */
-                if (playerCount == 1)
+
+                //Create our players
+                for (int i = 1; i <= playerCount; i++)
                 {
-                    PlayerList.Add(new PlayerReal("Player 01", '*'));
-                    PlayerList.Add(new CPU("CPU", 'O'));
-                }
-                /*
-                 * Settings for Multiplayer
-                 */
-                else if (playerCount == 2)
-                {
-                    //Create our players
-                    for (int i = 1; i <= playerCount; i++)
+                    //Assign name to Player
+                    string name = "Player 0" + i.ToString();
+
+                    //Assign coin symbol to Player
+                    char coin;
+
+                    Console.Write($"\n{name}, set your coin symbol (only ONE CHARACTER): ");
+                    do
                     {
-                        //Assign name to Player
-                        string name = "Player 0" + i.ToString();
+                        string getCoin = Console.ReadLine();
+                        Regex charsReserved = new Regex(@"^[-–—\s]$");   //Whitespace, hypens, en dash, and em dash
 
-                        //Assign coin symbol to Player
-                        char coin;
 
-                        Console.Write($"\n{name}, set your coin symbol (only ONE CHARACTER): ");
-                        do
+                        //Make sure only one char is entered
+                        if (getCoin.Length <= 0 || getCoin.Length > 1) Console.Write("Please enter ONLY ONE character: ");
+
+                        //Prohibit use of reserved chars---used for printing the Game Board
+                        else if (charsReserved.IsMatch(getCoin)) Console.Write("That is a RESERVED symbol. Choose something else: ");
+                        else
                         {
-                            string getCoin = Console.ReadLine();
-                            Regex charsReserved = new Regex(@"^[-–—\s]$");   //Whitespace, hypens, en dash, and em dash
-
-
-                            //Make sure only one char is entered
-                            if (getCoin.Length <= 0 || getCoin.Length > 1) Console.Write("Please enter ONLY ONE character: ");
-
-                            //Prohibit use of reserved chars---used for printing the Game Board
-                            else if (charsReserved.IsMatch(getCoin)) Console.Write("That is a RESERVED symbol. Choose something else: ");
-                            else
+                            //Check if entered symbol hasn't been used by another Player
+                            bool notUsed = true;
+                            if (PlayerList.Count != 0)
                             {
-                                //Check if entered symbol hasn't been used by another Player
-                                bool notUsed = true;
-                                if (PlayerList.Count != 0)
+                                foreach (var player in PlayerList)
                                 {
-                                    foreach (var player in PlayerList)
+                                    if (player.GetPlayerCoin() == Convert.ToChar(getCoin))
                                     {
-                                        if (player.GetPlayerCoin() == Convert.ToChar(getCoin))
-                                        {
-                                            Console.Write("SYMBOL ALREADY TAKEN! Choose something else: ");
-                                            notUsed = false;
-                                            break;
-                                        }
+                                        Console.Write("SYMBOL ALREADY TAKEN! Choose something else: ");
+                                        notUsed = false;
+                                        break;
                                     }
                                 }
-                                if (notUsed)
-                                {
-                                    coin = Convert.ToChar(getCoin);
-                                    break;
-                                }
                             }
-                        } while (true);
-                        //Create Player object
-                        PlayerList.Add(new PlayerReal(name, coin));
-                    }
-                }
+                            if (notUsed)
+                            {
+                                coin = Convert.ToChar(getCoin);
+                                break;
+                            }
+                        }
+                    } while (true);
 
-                /*
-                 * Start the game
-                 */
+                    //Create Player object
+                    PlayerList.Add(new Player(name, coin));
+                }
+                //Start the game
                 PlayGame(PlayerList, playerCount);
             }
 
@@ -525,129 +499,79 @@ namespace FinalProject_Connect4
                     //Prepare the players
                     Player.WhoseTurnDecide(PlayerList);
                     int playingNow = Player.WhoseTurnIsIt(PlayerList);
+                    string playerCurrent = "Current Player: " + PlayerList[playingNow].PlayerName + "\nCoin: " + PlayerList[playingNow].GetPlayerCoin() + "\n";
+
+                    //Some local variables
                     int columnNo = -1;
                     bool isPlayerDone = false;
-                    string playerCurrent = "Current Player: " + PlayerList[playingNow].PlayerName + "\nCoin: " + PlayerList[playingNow].GetPlayerCoin() + "\n";
 
                     //Show the board
                     ConnectFour.PrintGameBoard();
 
-                    /*
-                     * When "Current Player" is a real person
-                     */
-                    if (PlayerList[playingNow].GetType().Name.ToString() == "PlayerReal")
-                    {
-                        //Display current player's info
-                        Console.WriteLine(playerCurrent);
 
-                        //Ask player where to place his/her coin
-                        Console.Write("Pick a COLUMN NUMBER to place your coin: ");
+                    //Ask player where to place his/her coin
+                    Console.WriteLine(playerCurrent);
+                    Console.Write("Pick a COLUMN NUMBER to place your coin: ");
+                    do
+                    {
+                        //Ensure that columnNo is 1-7
                         do
                         {
-                            //Ensure that columnNo is 1-7
-                            do
-                            {
-                                Regex matchColumnNo = new Regex(@"^[1-7]$");
-                                string getColumnNo = Console.ReadLine();
+                            Regex matchColumnNo = new Regex(@"^[1-7]$");
+                            string getColumnNo = Console.ReadLine();
 
-                                if (!(matchColumnNo.IsMatch(getColumnNo)))
-                                {
-                                    ConnectFour.PrintGameBoard();
-                                    Console.WriteLine(playerCurrent);
-                                    Console.Write("ERROR! Enter from 1 to 7: ");
-                                }
-                                else
-                                {
-                                    //Get proper index, from 0 to 6
-                                    columnNo = Convert.ToInt16(getColumnNo) - 1;
-                                }
-                            } while (!(columnNo >= 0 && columnNo <= 6));
-
-
-                            //Place coin in board, when possible
-                            isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
-
-
-                            //When FULL, force player to pick another column
-                            if (!isPlayerDone)
+                            if (!(matchColumnNo.IsMatch(getColumnNo)))
                             {
                                 ConnectFour.PrintGameBoard();
                                 Console.WriteLine(playerCurrent);
-                                Console.Write("Column is FULL. Pick another column: ");
+                                Console.Write("ERROR! Enter from 1 to 7: ");
                             }
                             else
                             {
-                                var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
-                                bool hasSomeoneWon = pieces.Item1,
-                                    hasNobodyWon = ConnectFour.IsGameBoardFull();
-                                string message = pieces.Item2;
-
-                                if (hasSomeoneWon)
-                                {
-                                    someoneWon = hasSomeoneWon;
-                                    ConnectFour.PrintGameBoard();
-                                    Console.WriteLine(message);
-                                    winner = playingNow;
-                                }
-                                else if (hasNobodyWon)
-                                {
-                                    ConnectFour.PrintGameBoard();
-                                    endInDraw = hasNobodyWon;
-                                }
+                                //Get proper index, from 0 to 6
+                                columnNo = Convert.ToInt16(getColumnNo) - 1;
                             }
-                        } while (!isPlayerDone);
-                    }
-                    /*
-                     * When "Current Player" is a CPU
-                     */
-                    else if (PlayerList[playingNow].GetType().Name.ToString() == "CPU")
-                    {
-                        /*
-                         * Use a random number generator for CPU to place its coin
-                         * https://invidious.baczek.me/watch?v=1gSFd-YVFP8
-                         */
-                        Random randNo = new Random();
-                        do
+                        } while (!(columnNo >= 0 && columnNo <= 6));
+
+
+                        //Place coin in board, when possible
+                        isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
+
+
+                        //When FULL, force player to pick another column
+                        if (!isPlayerDone)
                         {
-                            //Ensure that columnNo is 1-7
-                            columnNo = randNo.Next(0, 7);
+                            ConnectFour.PrintGameBoard();
+                            Console.WriteLine(playerCurrent);
+                            Console.Write("Column is FULL. Pick another column: ");
+                        }
+                        else
+                        {
+                            var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
+                            bool hasSomeoneWon = pieces.Item1,
+                                hasNobodyWon = ConnectFour.IsGameBoardFull();
+                            string message = pieces.Item2;
 
-                            //Place coin in board, when possible
-                            isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
-                            Console.WriteLine(columnNo);
-
-                            //When AI is done, check if it has won
-                            if (isPlayerDone)
+                            if (hasSomeoneWon)
                             {
-                                var pieces = ConnectFour.FindWinner(PlayerList[playingNow].GetPlayerCoin());
-                                bool hasSomeoneWon = pieces.Item1,
-                                    hasNobodyWon = ConnectFour.IsGameBoardFull();
-                                string message = pieces.Item2;
-
-                                if (hasSomeoneWon)
-                                {
-                                    someoneWon = hasSomeoneWon;
-                                    ConnectFour.PrintGameBoard();
-                                    Console.WriteLine(message);
-                                    winner = playingNow;
-                                }
-                                else if (hasNobodyWon)
-                                {
-                                    ConnectFour.PrintGameBoard();
-                                    endInDraw = hasNobodyWon;
-                                }
+                                someoneWon = hasSomeoneWon;
+                                ConnectFour.PrintGameBoard();
+                                Console.WriteLine(message);
+                                winner = playingNow;
                             }
-                        } while (!isPlayerDone);
-                    }
+                            else if (hasNobodyWon)
+                            {
+                                ConnectFour.PrintGameBoard();
+                                endInDraw = hasNobodyWon;
+                            }
+                        }
+                    } while (!isPlayerDone);
 
 
-                    //Check if a player has won
                     if (someoneWon)
                     {
                         Console.WriteLine($"{PlayerList[winner].PlayerName} WINS!");
                     }
-
-                    //Check if the game comes to a standstill
                     else if (endInDraw)
                     {
                         Console.WriteLine("No more EMPTY tiles left!");
