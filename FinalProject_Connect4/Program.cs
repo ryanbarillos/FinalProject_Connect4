@@ -614,7 +614,6 @@ namespace FinalProject_Connect4
 
                             //Place coin in board, when possible
                             isPlayerDone = ConnectFour.InsertCoinInGameBoard(columnNo, PlayerList[playingNow].GetPlayerCoin());
-                            Console.WriteLine(columnNo);
 
                             //When AI is done, check if it has won
                             if (isPlayerDone)
