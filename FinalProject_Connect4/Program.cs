@@ -441,10 +441,14 @@ namespace FinalProject_Connect4
                     do
                     {
                         string getCoin = Console.ReadLine();
+                        Regex charsReserved = new Regex(@"^[-–—\s]$");   //Whitespace, hypens, en dash, and em dash
+
 
                         //Make sure only one char is entered
-                        if (getCoin.Length > 1) Console.Write("Please enter ONLY ONE character: ");
-                        else if (getCoin == " ") Console.Write("Whitespace is a RESERVED char. Choose something else: ");
+                        if (getCoin.Length <= 0 || getCoin.Length > 1) Console.Write("Please enter ONLY ONE character: ");
+
+                        //Prohibit use of reserved chars---used for printing the Game Board
+                        else if (charsReserved.IsMatch(getCoin)) Console.Write("That is a RESERVED symbol. Choose something else: ");
                         else
                         {
                             //Check if entered symbol hasn't been used by another Player
@@ -495,6 +499,7 @@ namespace FinalProject_Connect4
                     //Prepare the players
                     Player.WhoseTurnDecide(PlayerList);
                     int playingNow = Player.WhoseTurnIsIt(PlayerList);
+                    string playerCurrent = "Current Player: " + PlayerList[playingNow].PlayerName + "\nCoin: " + PlayerList[playingNow].GetPlayerCoin() + "\n";
 
                     //Some local variables
                     int columnNo = -1;
@@ -505,7 +510,8 @@ namespace FinalProject_Connect4
 
 
                     //Ask player where to place his/her coin
-                    Console.Write(PlayerList[playingNow].PlayerName + ", pick a COLUMN NUMBER to place your coin '" + PlayerList[playingNow].GetPlayerCoin() + "': ");
+                    Console.WriteLine(playerCurrent);
+                    Console.Write("Pick a COLUMN NUMBER to place your coin: ");
                     do
                     {
                         //Ensure that columnNo is 1-7
@@ -517,6 +523,7 @@ namespace FinalProject_Connect4
                             if (!(matchColumnNo.IsMatch(getColumnNo)))
                             {
                                 ConnectFour.PrintGameBoard();
+                                Console.WriteLine(playerCurrent);
                                 Console.Write("ERROR! Enter from 1 to 7: ");
                             }
                             else
@@ -535,6 +542,7 @@ namespace FinalProject_Connect4
                         if (!isPlayerDone)
                         {
                             ConnectFour.PrintGameBoard();
+                            Console.WriteLine(playerCurrent);
                             Console.Write("Column is FULL. Pick another column: ");
                         }
                         else
